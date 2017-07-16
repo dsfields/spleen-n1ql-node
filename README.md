@@ -2,6 +2,12 @@
 
 The [`spleen`](https://www.npmjs.com/package/spleen) module provides high-level abstractions for dynamic filters.  This module will convert a `spleen` [`Filter`](https://www.npmjs.com/package/spleen#class-filter) into a string that is usable within a N1QL statement's `WHERE` clause.
 
+__Contents__
+* [Usage](#usage)
+* [API](#api)
+* [Security Considerations](#security-considerations)
+* [Stringify Behavior](#stringify-behavior)
+
 ## Usage
 
 Add `spleen-n1ql` to your `package.json` file's `dependencies`:
@@ -77,3 +83,13 @@ It is highly recommended that you leave the `parameterize` option as `true` to h
 Additionally, as `spleen-n1ql` converts `Target` field references into dot-notation field references, it will throw an `InvalidTargetError` if any part of the path contains a single quote or backtick character as counter measure to SQL-injection attacks.
 
 To provide an additional layer of security it is recommended that you utilize the `allow` option to white-list possible fields passed in from user input.
+
+It is also highly recommend that you give leverge `spleen`'s `Filter.prototype.prioritize()` method before converting to a N1QL expression.  This allows you to reorder a `Filter`, and optimally utilize known indexes.
+
+## Stringify Behavior
+
+There are situations where a `spleen` filter does not neatly translate into a N1QL expression.  This is particularly true in the case of `spleen`'s `nil` operator.  For example, performing a greater-than on `nil` is technically valid with a `spleen` filter, but does not make much sense when translated to N1QL.  The `N1ql.stringify()` method will make attempts to reconcile this:
+
+* The operators `eq`, `lt`, `lte` when used with `nil` will result in an `IS NULL` N1QL expression.
+
+* The operators `neq`, `gt`, `gte` when used with `nil` will result in an `IS NOT NULL` N1QL expression.
