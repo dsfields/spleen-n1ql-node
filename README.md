@@ -1,6 +1,6 @@
 # spleen-n1ql
 
-The [`spleen`](https://www.npmjs.com/package/spleen) module provides high-level abstractions for filtering concerns.  This module will convert a `spleen` [`Filter`](https://www.npmjs.com/package/spleen#class-filter) into a string that is usable within a N1QL statement's `WHERE` clause.
+The [`spleen`](https://www.npmjs.com/package/spleen) module provides high-level abstractions for dynamic filters.  This module will convert a `spleen` [`Filter`](https://www.npmjs.com/package/spleen#class-filter) into a string that is usable within a N1QL statement's `WHERE` clause.
 
 ## Usage
 
@@ -64,7 +64,11 @@ Provides services for converting `spleen` filters into N1QL.
 
         - `require`: an array of RFC 6901 JSON pointer strings that are required to be in a `Filter`'s list of targets (`Filter.prototype.targets`).  If a required target is missing, an error is thrown.
 
-      This method returns a string.
+      This method returns an object with the following keys:
+
+      - `params`: an array of values, where the index of each entry corresponds to its `$#` placeholder in the filter statement.
+
+      - `value`: a string containing the N1QL filter statement.
 
 ## Security Considerations
 
