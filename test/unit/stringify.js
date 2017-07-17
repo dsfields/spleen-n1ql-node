@@ -719,18 +719,14 @@ describe('#stringify', () => {
     const f = '(/foo eq /bar or /baz eq 42) and (/qux neq /quux or /quuz gt 0)';
     const filter = spleen.parse(f).value;
     const result = stringify(filter);
-    /* eslint-disable max-len */
     assert.strictEqual(result.value, '(`foo` == `bar` OR `baz` == $1) AND (`qux` != `quux` OR `quuz` > $2)');
-    /* eslint-enable max-len */
   });
 
   it('should join groups with or', () => {
     const f = '(/foo eq /bar and /baz eq 42) or (/qux neq /quux or /quuz gt 0)';
     const filter = spleen.parse(f).value;
     const result = stringify(filter);
-    /* eslint-disable max-len */
     assert.strictEqual(result.value, '(`foo` == `bar` AND `baz` == $1) OR (`qux` != `quux` OR `quuz` > $2)');
-    /* eslint-enable max-len */
   });
 
   it('should join clause to group with and', () => {
@@ -758,10 +754,10 @@ describe('#stringify', () => {
   });
 
   it('should join group to clause with or', () => {
-    const exp = '(/foo eq /bar and /baz eq 42) or /qux gt 0';
+    const exp = '(/foo eq /bar and /baz eq nil) or /qux gt 0';
     const filter = spleen.parse(exp).value;
     const result = stringify(filter);
-    const r = '(`foo` == `bar` AND `baz` == $1) OR `qux` > $2';
+    const r = '(`foo` == `bar` AND `baz` IS NULL) OR `qux` > $1';
     assert.strictEqual(result.value, r);
   });
 
@@ -785,5 +781,85 @@ describe('#stringify', () => {
       filter.statements[0].value.operator = { type: 'blorg' };
       stringify(filter);
     }, errors.StringifyError);
+  });
+
+  it('should throw if invalid operator encountered with nil', () => {
+    assert.throws(() => {
+      const filter = spleen.parse('/foo eq nil').value;
+      filter.statements[0].value.operator = { type: 'like' };
+      stringify(filter);
+    }, errors.StringifyError);
+  });
+
+  it('should IS NULL when object is nil, operator eq', () => {
+    const filter = spleen.parse('/foo eq nil').value;
+    const result = stringify(filter).value;
+    assert.strictEqual(result, '`foo` IS NULL');
+  });
+
+  it('should IS NULL when object is nil, operator lt', () => {
+    const filter = spleen.parse('/foo lt nil').value;
+    const result = stringify(filter).value;
+    assert.strictEqual(result, '`foo` IS NULL');
+  });
+
+  it('should IS NULL when object is nil, operator lte', () => {
+    const filter = spleen.parse('/foo lte nil').value;
+    const result = stringify(filter).value;
+    assert.strictEqual(result, '`foo` IS NULL');
+  });
+
+  it('should IS NOT NULL when object is nil, operator neq', () => {
+    const filter = spleen.parse('/foo neq nil').value;
+    const result = stringify(filter).value;
+    assert.strictEqual(result, '`foo` IS NOT NULL');
+  });
+
+  it('should IS NOT NULL when object is nil, operator gt', () => {
+    const filter = spleen.parse('/foo gt nil').value;
+    const result = stringify(filter).value;
+    assert.strictEqual(result, '`foo` IS NOT NULL');
+  });
+
+  it('should IS NOT NULL when object is nil, operator gte', () => {
+    const filter = spleen.parse('/foo gte nil').value;
+    const result = stringify(filter).value;
+    assert.strictEqual(result, '`foo` IS NOT NULL');
+  });
+
+  it('should IS NULL when subject is nil, operator eq', () => {
+    const filter = spleen.parse('nil eq /foo').value;
+    const result = stringify(filter).value;
+    assert.strictEqual(result, '`foo` IS NULL');
+  });
+
+  it('should IS NULL when subject is nil, operator lt', () => {
+    const filter = spleen.parse('nil lt /foo').value;
+    const result = stringify(filter).value;
+    assert.strictEqual(result, '`foo` IS NULL');
+  });
+
+  it('should IS NULL when subject is nil, operator lte', () => {
+    const filter = spleen.parse('nil lte /foo').value;
+    const result = stringify(filter).value;
+    assert.strictEqual(result, '`foo` IS NULL');
+  });
+
+  it('should IS NOT NULL when subject is nil, operator neq', () => {
+    const filter = spleen.parse('nil neq /foo').value;
+    const result = stringify(filter).value;
+    assert.strictEqual(result, '`foo` IS NOT NULL');
+  });
+
+  it('should IS NOT NULL when subject is nil, operator gt', () => {
+    const filter = spleen.parse('nil gt /foo').value;
+    const result = stringify(filter).value;
+    assert.strictEqual(result, '`foo` IS NOT NULL');
+  });
+
+  it('should IS NOT NULL when subject is nil, operator gte', () => {
+    const filter = spleen.parse('nil gte /foo').value;
+    const result = stringify(filter).value;
+    assert.strictEqual(result, '`foo` IS NOT NULL');
   });
 });
