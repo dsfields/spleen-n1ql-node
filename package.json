@@ -2,7 +2,7 @@
   "name": "spleen-n1ql",
   "longName": "spleen-n1ql",
   "description": "Convert spleen filters into N1QL statements.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "dependencies": {
     "elv": "^1.0.0",
     "spleen": "^1.2.0"
