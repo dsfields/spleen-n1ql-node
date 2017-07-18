@@ -52,7 +52,7 @@ Provides services for converting `spleen` filters into N1QL.
 
   * __Methods__
 
-    + `N1ql.stringify(filter, [options])`: converts an instance of `spleen`'s `Filter`' class into a N1QL statement.
+    + `N1ql.stringify(filter [, options])`: converts an instance of `spleen`'s `Filter`' class into a N1QL statement.
 
       _Parameters_
 
