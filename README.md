@@ -25,7 +25,7 @@ const spleen = require('spleen');
 const filter = spleen.parse('/foo/bar eq 42 and /baz in [1,2,3]');
 const n1qlWhere = N1ql.stringify(filter, { parameterize: true });
 
-console.log(n1qlWhere); // foo.bar == $1 AND baz IN [$2,$3,$4]
+console.log(n1qlWhere); // `foo`.`bar` == $1 AND `baz` IN [$2,$3,$4]
 ```
 
 ## API
@@ -44,9 +44,9 @@ Provides services for converting `spleen` filters into N1QL.
 
       - `InvalidTargetError`: thrown if a target is encountered with an invalid format.  For example, if a segment of the path contains disallowed characters.
 
-      - `NonallowedFieldError`: thrown when a fieldis encountered that not been white-listed by the `allow` option.
+      - `NonallowedFieldError`: thrown when a field is encountered that not been white-listed by the `allow` option.
 
-      - `RequiredFieldError`: thrown when a field that has been required by the `require` option is not present in the given a given `Filter`.
+      - `RequiredFieldError`: thrown when a field that has been required by the `require` option is not present in the given `Filter`.
 
       - `StringifyError`: a general error thrown when `sleen-n1ql` is unable to convert a given `Filter` instance into a N1QL statement.  This should generally never happen, and is here as a safeguard in the event a `Filter` instance is corrupted.
 
